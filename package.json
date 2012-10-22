@@ -1,0 +1,8 @@
+{
+  "name": "StyleManager",
+  "version": "0.0.1",
+  "description": "Manage styles with JavaScript",
+  "devDependencies": {
+    "grunt-rigger": "~0.3.0"
+  }
+}

@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>StyleManager AMD</title>
+    <script src="http://requirejs.org/docs/release/2.1.1/comments/require.js"></script>
+    <script>
+      require(['../../build/StyleManager'], function(StyleManager) {
+        var sm = new StyleManager();
+        document.getElementsByTagName('head')[0].appendChild(sm.el);
+        sm.register('styles', 'h1 { color: #FF6600; }').render();
+      });
+    </script>
+</head>
+<body>
+  <h1>Hello, StyleManager!</h1>  
+</body>
+</html>
