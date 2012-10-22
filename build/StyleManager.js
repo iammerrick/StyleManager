@@ -11,13 +11,15 @@
      * StyleManager
      */
     var StyleManager = function() {
-      var el;
+      var el, head;
       
       if (document.createStyleSheet) {
         el = document.createStyleSheet();
       }
       else {
         el = document.createElement('style');
+        head = document.getElementsByTagName('head')[0];
+        head.appendChild(el);
       }
       
       this.el = el;
@@ -39,8 +41,7 @@
       }
       
       output = output.join('\n');
-      
-      if (this.el.hasOwnProperty('cssText')) {
+      if (this.el.cssText !== undefined) {
         this.el.cssText = output;
       } else {
         this.el.appendChild(document.createTextNode(output));

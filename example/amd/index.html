@@ -7,7 +7,6 @@
     <script>
       require(['../../build/StyleManager'], function(StyleManager) {
         var sm = new StyleManager();
-        document.getElementsByTagName('head')[0].appendChild(sm.el);
         sm.register('styles', 'h1 { color: #FF6600; }').render();
       });
     </script>
