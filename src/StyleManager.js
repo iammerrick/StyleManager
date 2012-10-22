@@ -1,6 +1,18 @@
 /**
  * StyleManager
  */
+ 
+var arrayToString = function(arr) {
+ return arr.join('\n');
+};
+ 
+var fragment = function(key, css) {
+  var buffer = [];
+  buffer.push('/* Source: ' + key + ' */');
+  buffer.push(css);
+  return arrayToString(buffer);
+};
+ 
 var StyleManager = function() {
   var el, head;
   
@@ -15,10 +27,29 @@ var StyleManager = function() {
   
   this.el = el;
   this.stylesheets = {};
+  this.changed = [];
 };
 
 StyleManager.prototype.register = function(key, source) {
-  this.stylesheets[key] = source;
+  var previous;
+  source = fragment(key, source);
+  
+  this.changed.push(key);
+  
+  if (this.stylesheets[key]) {
+    previous = this.stylesheets[key];
+  }
+  
+  this.stylesheets[key] = {
+    source: source,
+    node: document.createTextNode(source)
+  };
+  
+  if (previous) {
+    this.stylesheets[key].previous = previous;
+  }
+  
+  
   return this;
 };
 
@@ -31,24 +62,37 @@ StyleManager.prototype.clean = function() {
 };
 
 StyleManager.prototype.render = function() {
-  var output = [];
-  var key, src;
-
-  for (key in this.stylesheets) {
-    src = this.stylesheets[key];
-    output.push('/* Source: ' + key + ' */');
-    output.push(src);
-  }
-  
-  output = output.join('\n');
-  
-  this.clean();
   
   if (this.el.cssText !== undefined) {
-    this.el.cssText = output;
-  } else {
-    this.el.appendChild(document.createTextNode(output));
+    return this.renderIE();
+  }
+  
+  while (this.changed.length > 0) {
+    var i = this.changed.length - 1;
+    var stylesheet = this.stylesheets[this.changed[i]];
+    
+    if (stylesheet.previous) {
+      this.el.removeChild(stylesheet.previous.node);
+    }
+    
+    this.el.appendChild(stylesheet.node);
+    this.changed.splice(i, 1);
   }
   
   return this;
+};
+
+StyleManager.prototype.renderIE = function() {
+  var buffer = [];
+  var key;
+  
+  for (key in this.stylesheets) {
+    buffer.push(this.stylesheets[key].source);
+  }
+  
+  buffer = arrayToString(buffer);
+  
+  this.clean();
+  
+  this.el.cssText = buffer;
 };

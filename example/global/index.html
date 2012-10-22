@@ -6,7 +6,12 @@
     <script src="../../build/StyleManager.js"></script>
     <script>
         var sm = new StyleManager();
-        sm.register('styles', 'h1 { color: #FF6600; }').render();
+        sm.register('body', 'body { font-family: Helvetica; }');
+        sm.register('styles', 'h1 { color: #FF6600; }');
+        sm.render();
+        
+        sm.register('styles', 'h1 { color: #FF9900; }');
+        sm.render();
     </script>
 </head>
 <body>
