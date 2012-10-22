@@ -22,9 +22,18 @@ StyleManager.prototype.register = function(key, source) {
   return this;
 };
 
+StyleManager.prototype.clean = function() {
+  var child;
+  while (this.el.firstChild) {
+    child = this.el.firstChild;
+    this.el.removeChild(child);
+  }
+};
+
 StyleManager.prototype.render = function() {
   var output = [];
   var key, src;
+
   for (key in this.stylesheets) {
     src = this.stylesheets[key];
     output.push('/* Source: ' + key + ' */');
@@ -32,6 +41,9 @@ StyleManager.prototype.render = function() {
   }
   
   output = output.join('\n');
+  
+  this.clean();
+  
   if (this.el.cssText !== undefined) {
     this.el.cssText = output;
   } else {

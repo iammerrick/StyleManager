@@ -27,5 +27,14 @@ describe('StyleManager', function() {
       expect(sm.el.innerHTML).to.equal('/* Source: feature */\n.some-feature { color: #FF6600; }');
       expect(sm.el.tagName).to.equal('STYLE');
     });
+    
+    it('should not render duplicates if render is called twice', function() {
+      sm.register('feature', '.some-feature { color: #FF6600; }')
+        .render()
+        .render();
+    
+      expect(sm.el.innerHTML).to.equal('/* Source: feature */\n.some-feature { color: #FF6600; }');
+      expect(sm.el.tagName).to.equal('STYLE');
+    });
   });
 });
