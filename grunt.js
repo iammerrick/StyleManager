@@ -6,7 +6,7 @@ module.exports = function(grunt) {
   // Project configuration.
   grunt.initConfig({
     lint: {
-      files: ['grunt.js', 'src/**/*.js', 'test/StyleManagerTest.js']
+      files: ['grunt.js', 'build/StyleManager.js', 'test/StyleManagerTest.js']
     },
     watch: {
       files: '<config:lint.files>',
@@ -40,10 +40,10 @@ module.exports = function(grunt) {
         browser: true
       },
       globals: {
-        describe: true,
-        expect: true,
         it: true,
+        expect: true,
         beforeEach: true,
+        describe: true,
         StyleManager: true,
         define: true
       }
@@ -51,7 +51,7 @@ module.exports = function(grunt) {
   });
 
   // Default task.
-  grunt.registerTask('default', 'lint');
+  grunt.registerTask('default', 'build');
   
-  grunt.registerTask('build', 'lint rig:build min');
+  grunt.registerTask('build', 'rig:build lint min');
 };

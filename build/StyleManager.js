@@ -7,71 +7,28 @@
         root.StyleManager = factory();
     }
 }(this, function () {
-    /*jshint devel:true*/
-    /**
-     * StyleManager
-     */
-     
     var arrayToString = function(arr) {
      return arr.join('\n');
     };
-     
+    
     var fragment = function(key, css) {
       var buffer = [];
       buffer.push('/* Source: ' + key + ' */');
       buffer.push(css);
       return arrayToString(buffer);
     };
-     
-    var StyleManager = function(name) {
-      var el, head;
-      
-      if (document.createStyleSheet) {
-        el = document.createStyleSheet();
-      }
-      else {
-        el = document.createElement('style');
-        head = document.getElementsByTagName('head')[0];
-        head.appendChild(el);
-      }
-      
-      
-      this.el = el;
-      
-      this.name(name);
-      this.stylesheets = {};
-      this.changed = [];
-    };
+    var AbstractRenderer = function() {};
     
-    StyleManager.prototype.name = function(name) {
-      
+    AbstractRenderer.prototype.name = function(name) {
+    
       if ( ! name) {
         return this.el.id || false;
       }
-      
+    
       this.el.id = name;
     };
     
-    StyleManager.prototype.register = function(key, source) {
-      source = fragment(key, source);
-      
-      this.changed.push(key);
-      
-      if (this.stylesheets[key] && !this.el.cssText) {
-        this.el.removeChild(this.stylesheets[key].node);
-      }
-      
-      this.stylesheets[key] = {
-        source: source,
-        node: document.createTextNode(source)
-      };
-      
-      this.render();
-      
-      return this;
-    };
-    
-    StyleManager.prototype.clean = function() {
+    AbstractRenderer.prototype.clean = function() {
       var child;
       while (this.el.firstChild) {
         child = this.el.firstChild;
@@ -79,29 +36,46 @@
       }
     };
     
-    StyleManager.prototype.render = function() {
+    AbstractRenderer.prototype.getElement = function() {
+      return this.el;
+    };
+    var Renderer = function() {
+      var head;
       
-      if (this.el.cssText !== undefined) {
-        return this.renderIE();
-      }
+      this.el = document.createElement('style');
       
-      while (this.changed.length > 0) {
-        var i = this.changed.length - 1;
-        var stylesheet = this.stylesheets[this.changed[i]];
-        
-        this.el.appendChild(stylesheet.node);
-        this.changed.splice(i, 1);
-      }
-      
-      return this;
+      head = document.getElementsByTagName('head')[0];
+      head.appendChild(this.el);
     };
     
-    StyleManager.prototype.renderIE = function() {
+    Renderer.prototype = new AbstractRenderer();
+    
+    Renderer.prototype.render = function(stylesheets, changed) {
+      var i, stylesheet;
+      while (changed.length > 0) {
+        i = changed.length - 1;
+        stylesheet = stylesheets[changed[i]];
+        
+        if (stylesheet.previous) {
+          this.el.removeChild(stylesheet.previous.node);
+        }
+        
+        this.el.appendChild(stylesheet.node);
+        changed.splice(i, 1);
+      }
+    };
+    var IERenderer = function() {
+      this.el = document.createStyleSheet();
+    };
+    
+    IERenderer.prototype = new AbstractRenderer();
+    
+    IERenderer.prototype.render = function(stylesheets, changed) {
       var buffer = [];
       var key;
       
-      for (key in this.stylesheets) {
-        buffer.push(this.stylesheets[key].source);
+      for (key in stylesheets) {
+        buffer.push(stylesheets[key].source);
       }
       
       buffer = arrayToString(buffer);
@@ -109,6 +83,66 @@
       this.clean();
       
       this.el.cssText = buffer;
+    };
+    
+    
+     
+    var StyleManager = function(name) {
+      this.setRenderer(name);
+      
+      this.stylesheets = {};
+      this.changed = [];
+    };
+    
+    StyleManager.prototype.setRenderer = function(name) {
+      if (document.createStyleSheet) {
+        this.renderer = new IERenderer();
+      } else {
+        this.renderer = new Renderer();
+      }
+      
+      this.renderer.name(name);
+    };
+    
+    StyleManager.prototype.register = function(key, source) {
+      var previous = false;
+      source = fragment(key, source);
+      
+      this.changed.push(key);
+      
+      if (this.stylesheets[key]) {
+        previous = this.stylesheets[key];
+      }
+      
+      this.stylesheets[key] = {
+        source: source,
+        node: document.createTextNode(source)
+      };
+      
+      this.stylesheets[key].previous = previous;
+      
+      this.render();
+      
+      return this;
+    };
+    
+    StyleManager.prototype.name = function(name) {
+      return this.renderer.name(name);
+    };
+    
+    StyleManager.prototype.clean = function() {
+      this.renderer.clean();
+    };
+    
+    StyleManager.prototype.render = function() {
+      
+      this.renderer.render(this.stylesheets, this.changed);
+      
+      return this;
+    };
+    
+    StyleManager.prototype.getRenderer = function() {
+      return this.renderer;
     };
     return StyleManager;
 }));

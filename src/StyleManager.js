@@ -1,55 +1,33 @@
-/*jshint devel:true*/
-/**
- * StyleManager
- */
- 
-var arrayToString = function(arr) {
- return arr.join('\n');
-};
- 
-var fragment = function(key, css) {
-  var buffer = [];
-  buffer.push('/* Source: ' + key + ' */');
-  buffer.push(css);
-  return arrayToString(buffer);
-};
+//= helpers.js
+//= renderers/AbstractRenderer.js
+//= renderers/Renderer.js
+//= renderers/IERenderer.js
  
 var StyleManager = function(name) {
-  var el, head;
+  this.setRenderer(name);
   
-  if (document.createStyleSheet) {
-    el = document.createStyleSheet();
-  }
-  else {
-    el = document.createElement('style');
-    head = document.getElementsByTagName('head')[0];
-    head.appendChild(el);
-  }
-  
-  
-  this.el = el;
-  
-  this.name(name);
   this.stylesheets = {};
   this.changed = [];
 };
 
-StyleManager.prototype.name = function(name) {
-  
-  if ( ! name) {
-    return this.el.id || false;
+StyleManager.prototype.setRenderer = function(name) {
+  if (document.createStyleSheet) {
+    this.renderer = new IERenderer();
+  } else {
+    this.renderer = new Renderer();
   }
   
-  this.el.id = name;
+  this.renderer.name(name);
 };
 
 StyleManager.prototype.register = function(key, source) {
+  var previous = false;
   source = fragment(key, source);
   
   this.changed.push(key);
   
-  if (this.stylesheets[key] && !this.el.cssText) {
-    this.el.removeChild(this.stylesheets[key].node);
+  if (this.stylesheets[key]) {
+    previous = this.stylesheets[key];
   }
   
   this.stylesheets[key] = {
@@ -57,47 +35,28 @@ StyleManager.prototype.register = function(key, source) {
     node: document.createTextNode(source)
   };
   
+  this.stylesheets[key].previous = previous;
+  
   this.render();
   
   return this;
 };
 
+StyleManager.prototype.name = function(name) {
+  return this.renderer.name(name);
+};
+
 StyleManager.prototype.clean = function() {
-  var child;
-  while (this.el.firstChild) {
-    child = this.el.firstChild;
-    this.el.removeChild(child);
-  }
+  this.renderer.clean();
 };
 
 StyleManager.prototype.render = function() {
   
-  if (this.el.cssText !== undefined) {
-    return this.renderIE();
-  }
-  
-  while (this.changed.length > 0) {
-    var i = this.changed.length - 1;
-    var stylesheet = this.stylesheets[this.changed[i]];
-    
-    this.el.appendChild(stylesheet.node);
-    this.changed.splice(i, 1);
-  }
+  this.renderer.render(this.stylesheets, this.changed);
   
   return this;
 };
 
-StyleManager.prototype.renderIE = function() {
-  var buffer = [];
-  var key;
-  
-  for (key in this.stylesheets) {
-    buffer.push(this.stylesheets[key].source);
-  }
-  
-  buffer = arrayToString(buffer);
-  
-  this.clean();
-  
-  this.el.cssText = buffer;
+StyleManager.prototype.getRenderer = function() {
+  return this.renderer;
 };

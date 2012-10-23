@@ -8,11 +8,12 @@ describe('StyleManager', function() {
   
   describe('constructor', function() {
     it('should create a new style tag', function() {
-      expect(sm.el).to.exist;
+      expect(sm.getRenderer().getElement()).to.exist;
     });
     
     it('should create a new style tag with an id', function() {
       var winning = new StyleManager('winning');
+      
       expect(winning.name()).to.equal('winning');
     });
   });
@@ -29,8 +30,8 @@ describe('StyleManager', function() {
       sm.register('feature', '.some-feature { color: #FF6600; }')
         .render();
 
-      expect(sm.el.innerHTML).to.equal('/* Source: feature */\n.some-feature { color: #FF6600; }');
-      expect(sm.el.tagName).to.equal('STYLE');
+      expect(sm.getRenderer().getElement().innerHTML).to.equal('/* Source: feature */\n.some-feature { color: #FF6600; }');
+      expect(sm.getRenderer().getElement().tagName).to.equal('STYLE');
     });
     
     it('should not render duplicates if render is called twice', function() {
@@ -38,8 +39,8 @@ describe('StyleManager', function() {
         .render()
         .render();
     
-      expect(sm.el.innerHTML).to.equal('/* Source: feature */\n.some-feature { color: #FF6600; }');
-      expect(sm.el.tagName).to.equal('STYLE');
+      expect(sm.getRenderer().getElement().innerHTML).to.equal('/* Source: feature */\n.some-feature { color: #FF6600; }');
+      expect(sm.getRenderer().getElement().tagName).to.equal('STYLE');
     });
   });
   
@@ -51,7 +52,7 @@ describe('StyleManager', function() {
     
     it('should set the id of the style attribute', function() {
       sm.name('dominating');
-      expect(sm.el.id).to.equal('dominating');
+      expect(sm.getRenderer().getElement().id).to.equal('dominating');
     });
   });
 });
