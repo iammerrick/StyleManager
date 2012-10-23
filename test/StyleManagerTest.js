@@ -10,6 +10,11 @@ describe('StyleManager', function() {
     it('should create a new style tag', function() {
       expect(sm.el).to.exist;
     });
+    
+    it('should create a new style tag with an id', function() {
+      var winning = new StyleManager('winning');
+      expect(winning.name()).to.equal('winning');
+    });
   });
   
   describe('register', function() {
@@ -35,6 +40,18 @@ describe('StyleManager', function() {
     
       expect(sm.el.innerHTML).to.equal('/* Source: feature */\n.some-feature { color: #FF6600; }');
       expect(sm.el.tagName).to.equal('STYLE');
+    });
+  });
+  
+  describe('name', function() {
+    it('should set and get the name of the style attribute', function() {
+      sm.name('winning');
+      expect(sm.name()).to.equal('winning');
+    });
+    
+    it('should set the id of the style attribute', function() {
+      sm.name('dominating');
+      expect(sm.el.id).to.equal('dominating');
     });
   });
 });

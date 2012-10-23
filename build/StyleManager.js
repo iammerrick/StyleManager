@@ -7,6 +7,7 @@
         root.StyleManager = factory();
     }
 }(this, function () {
+    /*jshint devel:true*/
     /**
      * StyleManager
      */
@@ -22,7 +23,7 @@
       return arrayToString(buffer);
     };
      
-    var StyleManager = function() {
+    var StyleManager = function(name) {
       var el, head;
       
       if (document.createStyleSheet) {
@@ -34,19 +35,30 @@
         head.appendChild(el);
       }
       
+      
       this.el = el;
+      
+      this.name(name);
       this.stylesheets = {};
       this.changed = [];
     };
     
+    StyleManager.prototype.name = function(name) {
+      
+      if ( ! name) {
+        return this.el.id || false;
+      }
+      
+      this.el.id = name;
+    };
+    
     StyleManager.prototype.register = function(key, source) {
-      var previous;
       source = fragment(key, source);
       
       this.changed.push(key);
       
-      if (this.stylesheets[key]) {
-        previous = this.stylesheets[key];
+      if (this.stylesheets[key] && !this.el.cssText) {
+        this.el.removeChild(this.stylesheets[key].node);
       }
       
       this.stylesheets[key] = {
@@ -54,10 +66,7 @@
         node: document.createTextNode(source)
       };
       
-      if (previous) {
-        this.stylesheets[key].previous = previous;
-      }
-      
+      this.render();
       
       return this;
     };
@@ -79,10 +88,6 @@
       while (this.changed.length > 0) {
         var i = this.changed.length - 1;
         var stylesheet = this.stylesheets[this.changed[i]];
-        
-        if (stylesheet.previous) {
-          this.el.removeChild(stylesheet.previous.node);
-        }
         
         this.el.appendChild(stylesheet.node);
         this.changed.splice(i, 1);

@@ -5,7 +5,7 @@
     <title>StyleManager Global</title>
     <script src="../../build/StyleManager.js"></script>
     <script>
-        var sm = new StyleManager();
+        var sm = new StyleManager('name');
         sm.register('body', 'body { font-family: Helvetica; }');
         sm.register('styles', 'h1 { color: #FF6600; }');
         sm.render();
