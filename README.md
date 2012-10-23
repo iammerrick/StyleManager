@@ -27,10 +27,7 @@ styles.register('component', 'h1 { color: #FF6600; }');
 ### render
 
 ```javascript
-// Add the element to the DOM
-document.getElementsByTagName('head')[0].appendChild(styles.el);
-
-// Render the styles
+// Render the styles (called automatically on each register)
 styles.render();
 ```
 
