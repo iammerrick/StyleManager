@@ -6,22 +6,30 @@ module.exports = function(grunt) {
   // Project configuration.
   grunt.initConfig({
     lint: {
-      files: ['grunt.js', 'build/StyleManager.js', 'test/StyleManagerTest.js']
+      files: ['grunt.js', 'build/StyleManager.js', 'test/StyleManagerTest.js', 'build/css.js']
     },
     watch: {
-      files: '<config:lint.files>',
+      files: 'src/**/*.js',
       tasks: 'build'
     },
     rig: {
       build: {
         src: ['src/wrapper.js'],
         dest: 'build/StyleManager.js'
+      },
+      plugin: {
+        src: ['src/plugin-wrapper.js'],
+        dest: 'build/css.js'
       }
     },
     min: {
       dist: {
         src: ['build/StyleManager.js'],
         dest: 'build/StyleManager.min.js'
+      },
+      plugin: {
+        src: ['build/css.js'],
+        dest: 'build/css.min.js'
       }
     },
     jshint: {
@@ -53,5 +61,5 @@ module.exports = function(grunt) {
   // Default task.
   grunt.registerTask('default', 'build');
   
-  grunt.registerTask('build', 'rig:build lint min');
+  grunt.registerTask('build', 'rig:build rig:plugin lint min');
 };

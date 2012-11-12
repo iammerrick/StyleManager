@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>StyleManager AMD Plugin</title>
+    <script src="http://requirejs.org/docs/release/2.1.1/comments/require.js"></script>
+    <script>
+      require(['../../build/css!amd-plugin.css', '../../build/css!amd-plugin-other.css'], function(style, otherStyle) {
+        setTimeout(function() {
+          otherStyle.clean();
+        }, 5000);
+      });
+    </script>
+</head>
+<body>
+  <h1>Hello, StyleManager!</h1>  
+</body>
+</html>
