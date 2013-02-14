@@ -6,8 +6,8 @@ StyleManager is a low level library that manages a style tag, useful for thick c
 
 - [StyleManager.js](http://raw.github.com/iammerrick/StyleManager/master/build/StyleManager.js)
 - [StyleManager.min.js](http://raw.github.com/iammerrick/StyleManager/master/build/StyleManager.min.js)
-- [css.js](http://raw.github.com/iammerrick/StyleManager/master/build/StyleManager.js) The AMD plugin.
-- [css.min.js](http://raw.github.com/iammerrick/StyleManager/master/build/StyleManager.min.js) The AMD plugin minified.
+- [css.js](http://raw.github.com/iammerrick/StyleManager/master/build/css.js) The AMD plugin.
+- [css.min.js](http://raw.github.com/iammerrick/StyleManager/master/build/css.min.js) The AMD plugin minified.
 
 ## Usage
 
